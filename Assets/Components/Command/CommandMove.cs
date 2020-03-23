@@ -9,27 +9,90 @@ public class CommandMove : Command
     [SerializeField]
     private float distance = 0f;
 
+    [SerializeField]
+    private float rotationDuration = 1f;
+    [SerializeField]
+    private float movementDuration = 1f;
+
     private Transform droneTransform = null;
+
+    private bool rotating = false;
+    private bool moving = false;
 
     protected override void Initialise()
     {
         droneTransform = drone.transform;
+
+        rotating = false;
+        moving = false;
     }
 
-    protected override void Play()
+    protected override IEnumerator Play()
     {
-        Rotate();
+        yield return Rotate();
 
-        droneTransform.Translate(droneTransform.forward * distance);
+        yield return Move();
+
+        End();
     }
 
-    private void Rotate()
+    private IEnumerator Rotate()
     {
-        Vector3 vecDirection = DirectionUtil.ToVector(direction);
+        if (rotating) yield return null;
 
-        Vector3 relativePos = vecDirection - droneTransform.position;
-        Quaternion rotation = Quaternion.LookRotation(relativePos, Vector3.up);
-        droneTransform.rotation = rotation;
+        rotating = true;
+
+        float counter = 0f;
+        float rate = 1f / rotationDuration;
+
+        float startAngle = droneTransform.localEulerAngles.y;
+        float toAngle = startAngle + DirectionUtil.ToAngle(direction);
+
+        Debug.Log(direction.ToString() + " (" + DirectionUtil.ToAngle(direction) + ") : " + startAngle + " to " + toAngle);
+
+        if(startAngle != toAngle)
+        {
+            while (counter < 1f)
+            {
+                counter += Time.deltaTime * rate;
+
+                counter = Mathf.Clamp(counter, 0f, 1f);
+                
+                float yLerp = Mathf.LerpAngle(startAngle, toAngle, counter);
+
+                Vector3 vLerp = new Vector3(0, yLerp, 0);
+                droneTransform.localRotation = Quaternion.Euler(vLerp);
+
+                yield return null;
+            }
+        }
+
+        rotating = false;
+    }
+
+    private IEnumerator Move()
+    {
+        if (moving) yield return null;
+
+        moving = true;
+
+        float counter = 0;
+        float rate = 1f / movementDuration;
+
+        Vector3 startPos = droneTransform.localPosition;
+        Vector3 toPos = startPos + droneTransform.forward * distance;
+
+        while (counter < 1f)
+        {
+            counter += Time.deltaTime * rate;
+
+            counter = Mathf.Clamp(counter, 0f, 1f);
+
+            droneTransform.localPosition = Vector3.Lerp(startPos, toPos, counter);
+            yield return null;
+        }
+
+        moving = false;
     }
 
     private void OnDrawGizmos()
@@ -37,7 +100,10 @@ public class CommandMove : Command
         if(droneTransform != null)
         {
             Gizmos.color = Color.red;
-            Gizmos.DrawLine(droneTransform.position, droneTransform.forward * distance);
+            if (moving)
+            {
+                Gizmos.DrawLine(droneTransform.localPosition, droneTransform.localPosition + DirectionUtil.ToVector(direction) * distance);
+            }
         }
     }
 }

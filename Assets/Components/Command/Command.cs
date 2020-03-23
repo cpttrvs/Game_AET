@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public abstract class Command : MonoBehaviour
+public abstract class Command : MonoBehaviour, ICloneable
 {
     protected Drone drone = null;
 
@@ -32,13 +32,21 @@ public abstract class Command : MonoBehaviour
 
         OnLaunch?.Invoke(this);
 
-        Play();
+        StartCoroutine(Play());
+    }
 
+    public void End()
+    {
         OnEnd?.Invoke(this);
     }
 
-    protected abstract void Play();
+    protected abstract IEnumerator Play();
     protected abstract void Initialise();
 
     public void SetDrone(Drone d) { drone = d; }
+
+    public object Clone()
+    {
+        return this.MemberwiseClone();
+    }
 }

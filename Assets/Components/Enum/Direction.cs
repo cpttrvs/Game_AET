@@ -12,14 +12,28 @@ public static class DirectionUtil
     public static Vector3 ToVector(Direction d)
     {
         if (d == Direction.FORWARD)
-            return new Vector3(0, 0, 1);
+            return Vector3.forward;
         if (d == Direction.BACKWARD)
-            return new Vector3(0, 0, -1);
+            return Vector3.back;
         if (d == Direction.LEFT)
-            return new Vector3(-1, 0, 0);
+            return Vector3.left;
         if (d == Direction.RIGHT)
-            return new Vector3(1, 0, 0);
+            return Vector3.right;
 
         return Vector3.zero;
+    }
+
+    public static float ToAngle(Direction d)
+    {
+        if (d == Direction.FORWARD)
+            return 0f;
+        if (d == Direction.BACKWARD)
+            return 180f;
+        if (d == Direction.LEFT)
+            return -90f;
+        if (d == Direction.RIGHT)
+            return 90f;
+
+        return 0f;
     }
 }

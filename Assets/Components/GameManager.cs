@@ -11,7 +11,11 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         foreach (Command c in commands)
-            drone.AddCommand(c);
+        {
+            Command clone = (Command) c.Clone();
+
+            drone.AddCommand(clone);
+        }
 
         drone.OnPrepare += Drone_OnPrepare;
         drone.OnPlay += Drone_OnPlay;
