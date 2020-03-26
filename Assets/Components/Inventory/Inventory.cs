@@ -23,9 +23,10 @@ public class Inventory : MonoBehaviour
         }
 
         _items.Add(i);
-        OnAdd(i);
 
         Debug.Log("Inventory: added " + i.name + ", capacity " + _items.Count + "/" + maxCapacity);
+
+        OnAdd(i);
         return true;
     }
 
@@ -36,9 +37,10 @@ public class Inventory : MonoBehaviour
         if(_items.Contains(i))
         {
             _items.Remove(i);
-            OnRemove(i);
 
             Debug.Log("Inventory: removed " + i.name + ", capacity " + _items.Count + "/" + maxCapacity);
+
+            OnRemove(i);
             return true;
         } else
         {

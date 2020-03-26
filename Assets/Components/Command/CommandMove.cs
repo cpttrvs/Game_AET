@@ -14,6 +14,9 @@ public class CommandMove : Command
     [SerializeField]
     private float movementDuration = 1f;
 
+    [SerializeField]
+    private string rayTag = "Diggable";
+
     private Transform droneTransform = null;
 
     private bool rotating = false;
@@ -38,58 +41,82 @@ public class CommandMove : Command
 
     private IEnumerator Rotate()
     {
-        if (rotating) yield return null;
-
-        rotating = true;
-
-        float counter = 0f;
-        float rate = 1f / rotationDuration;
-
-        float startAngle = droneTransform.localEulerAngles.y;
-        float toAngle = startAngle + DirectionUtil.ToAngle(direction);
-        
-        if(startAngle != toAngle)
+        if (!rotating)
         {
-            while (counter < 1f)
+            rotating = true;
+
+            float counter = 0f;
+            float rate = 1f / rotationDuration;
+
+            float startAngle = droneTransform.localEulerAngles.y;
+            float toAngle = startAngle + DirectionUtil.ToAngle(direction);
+
+            if (startAngle != toAngle)
             {
-                counter += Time.deltaTime * rate;
+                while (counter < 1f)
+                {
+                    counter += Time.deltaTime * rate;
 
-                counter = Mathf.Clamp(counter, 0f, 1f);
-                
-                float yLerp = Mathf.LerpAngle(startAngle, toAngle, counter);
+                    counter = Mathf.Clamp(counter, 0f, 1f);
 
-                Vector3 vLerp = new Vector3(0, yLerp, 0);
-                droneTransform.localRotation = Quaternion.Euler(vLerp);
+                    float yLerp = Mathf.LerpAngle(startAngle, toAngle, counter);
 
-                yield return null;
+                    Vector3 vLerp = new Vector3(0, yLerp, 0);
+                    droneTransform.localRotation = Quaternion.Euler(vLerp);
+
+                    yield return null;
+                }
             }
-        }
 
-        rotating = false;
+            rotating = false;
+        }
     }
 
     private IEnumerator Move()
     {
-        if (moving) yield return null;
-
-        moving = true;
-
-        float counter = 0;
-        float rate = 1f / movementDuration;
-
-        Vector3 startPos = droneTransform.localPosition;
-        Vector3 toPos = startPos + droneTransform.forward * distance;
-
-        while (counter < 1f)
+        if (!moving)
         {
-            counter += Time.deltaTime * rate;
+            if (CanPass())
+            {
+                moving = true;
 
-            counter = Mathf.Clamp(counter, 0f, 1f);
+                float counter = 0;
+                float rate = 1f / movementDuration;
 
-            droneTransform.localPosition = Vector3.Lerp(startPos, toPos, counter);
-            yield return null;
+                Vector3 startPos = droneTransform.localPosition;
+                Vector3 toPos = startPos + droneTransform.forward * distance;
+
+                while (counter < 1f)
+                {
+                    counter += Time.deltaTime * rate;
+
+                    counter = Mathf.Clamp(counter, 0f, 1f);
+
+                    droneTransform.localPosition = Vector3.Lerp(startPos, toPos, counter);
+
+                    yield return null;
+                }
+
+                moving = false;
+            }
+        }
+    }
+
+    private bool CanPass()
+    {
+        RaycastHit[] hits = Physics.RaycastAll(droneTransform.position, droneTransform.forward * distance, distance, LayerMask.NameToLayer(rayTag));
+
+        foreach (RaycastHit h in hits)
+        {
+            DiggableTile diggableTile = h.collider.GetComponentInChildren<DiggableTile>();
+
+            if (diggableTile != null)
+            {
+                Debug.Log("test:" + diggableTile.IsWalkable());
+                return diggableTile.IsWalkable();
+            }
         }
 
-        moving = false;
+        return true;
     }
 }

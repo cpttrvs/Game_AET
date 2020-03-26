@@ -15,6 +15,8 @@ public class CommandGrab : Command
 
     private Inventory droneInventory = null;
 
+    private bool grabbing = false;
+
     protected override void Initialise()
     {
         droneInventory = drone.inventory;
@@ -22,22 +24,34 @@ public class CommandGrab : Command
 
     protected override IEnumerator Play()
     {
-        Collider[] hitColliders = Physics.OverlapSphere(drone.transform.position, radius);
-        foreach(Collider c in hitColliders)
-        {
-            if(c.CompareTag(rayTag))
-            {
-                Item item = c.GetComponentInChildren<Item>().Grab();
-                if(item != null)
-                {
-                    Debug.Log("GRAB: " + item.name);
-                    droneInventory.TryAddItem(item);
-                }
-            }
-        }
-
-        yield return new WaitForSeconds(duration);
+        yield return Grab();
 
         End();
+    }
+
+    private IEnumerator Grab()
+    {
+        if (!grabbing)
+        {
+            grabbing = true;
+
+            Collider[] hitColliders = Physics.OverlapSphere(drone.transform.position, radius);
+            foreach (Collider c in hitColliders)
+            {
+                if (c.CompareTag(rayTag))
+                {
+                    Item item = c.GetComponentInChildren<Item>().Grab();
+                    if (item != null)
+                    {
+                        Debug.Log("GRAB: " + item.name);
+                        droneInventory.TryAddItem(item);
+                    }
+                }
+            }
+
+            yield return new WaitForSeconds(duration);
+
+            grabbing = false;
+        }
     }
 }
