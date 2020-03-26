@@ -21,7 +21,8 @@ public class GameManager : MonoBehaviour
         drone.OnPlay += Drone_OnPlay;
         drone.OnEnd += Drone_OnEnd;
 
-
+        drone.inventory.OnAdd += Inventory_OnAdd;
+        
         drone.Prepare();
     }
 
@@ -40,4 +41,11 @@ public class GameManager : MonoBehaviour
 
     }
 
+    private void Inventory_OnAdd(Item i)
+    {
+        if(i is Artifact)
+        {
+            Debug.Log("WON");
+        }
+    }
 }

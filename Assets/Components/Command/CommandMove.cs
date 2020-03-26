@@ -47,9 +47,7 @@ public class CommandMove : Command
 
         float startAngle = droneTransform.localEulerAngles.y;
         float toAngle = startAngle + DirectionUtil.ToAngle(direction);
-
-        Debug.Log(direction.ToString() + " (" + DirectionUtil.ToAngle(direction) + ") : " + startAngle + " to " + toAngle);
-
+        
         if(startAngle != toAngle)
         {
             while (counter < 1f)
@@ -93,17 +91,5 @@ public class CommandMove : Command
         }
 
         moving = false;
-    }
-
-    private void OnDrawGizmos()
-    {
-        if(droneTransform != null)
-        {
-            Gizmos.color = Color.red;
-            if (moving)
-            {
-                Gizmos.DrawLine(droneTransform.localPosition, droneTransform.localPosition + DirectionUtil.ToVector(direction) * distance);
-            }
-        }
     }
 }

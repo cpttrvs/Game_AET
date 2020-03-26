@@ -5,6 +5,10 @@ using System;
 
 public class Drone : MonoBehaviour
 {
+    [SerializeField]
+    private Inventory _inventory = null;
+    public Inventory inventory { get { return _inventory; } }
+
     private List<Command> commands = null;
 
     private int commandsPrepared = 0;
