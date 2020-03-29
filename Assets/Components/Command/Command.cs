@@ -35,7 +35,7 @@ public abstract class Command : MonoBehaviour, ICloneable
         StartCoroutine(Play());
     }
 
-    public void End()
+    public virtual void End()
     {
         OnEnd?.Invoke(this);
     }

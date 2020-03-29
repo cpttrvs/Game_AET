@@ -108,12 +108,11 @@ public class CommandMove : Command
 
         foreach (RaycastHit h in hits)
         {
-            DiggableTile diggableTile = h.collider.GetComponentInChildren<DiggableTile>();
+            Tile tile = h.collider.GetComponentInChildren<Tile>();
 
-            if (diggableTile != null)
+            if (tile != null)
             {
-                Debug.Log("test:" + diggableTile.IsWalkable());
-                return diggableTile.IsWalkable();
+                return tile.IsWalkable();
             }
         }
 

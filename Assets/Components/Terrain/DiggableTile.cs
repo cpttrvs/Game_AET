@@ -19,7 +19,7 @@ public class DiggableTile : Tile
     [SerializeField]
     private bool isFilled = false;
 
-    public bool IsWalkable() { return isFilled; }
+    public override bool IsWalkable() { return isFilled; }
 
     private void Start()
     {
@@ -29,7 +29,8 @@ public class DiggableTile : Tile
 
         if(burriedItem != null)
         {
-            burriedItem.gameObject.SetActive(isDigged);
+            if (isDigged) burriedItem.Show();
+            else burriedItem.Hide();
         }
 
         burriedItem.OnGrab += Item_OnGrab;
@@ -43,8 +44,8 @@ public class DiggableTile : Tile
         ground.SetActive(false);
         crater.SetActive(true);
 
-        if(burriedItem != null)
-            burriedItem.gameObject.SetActive(true);
+        if (burriedItem != null)
+            burriedItem.Show();
 
         isDigged = true;
         isFilled = false;
@@ -56,7 +57,6 @@ public class DiggableTile : Tile
 
         rocks.SetActive(false);
         ground.SetActive(true);
-        crater.SetActive(false);
 
         isFilled = true;
         isDigged = false;
